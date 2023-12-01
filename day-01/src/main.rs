@@ -42,8 +42,6 @@ fn main() {
 }
 
 fn calibration_value(text: &str) -> u32 {
-    const RADIX: u32 = 10;
-    let re = Regex::new(r"[A-z]").unwrap();
     let re_text = text
         .replace("one", "o1e")
         .replace("two", "t2o")
@@ -54,17 +52,23 @@ fn calibration_value(text: &str) -> u32 {
         .replace("seven", "s7n")
         .replace("eight", "e8t")
         .replace("nine", "n9e");
+
+    const RADIX: u32 = 10;
+    let re = Regex::new(r"[A-z]").unwrap();
     let filter_text = re.replace_all(&re_text, "");
 
     let lines = filter_text.lines();
 
-    let mut total = 0;
-    for line in lines {
-        if line.len() > 0 {
+    lines
+        .map(|line| {
+            if line.len() == 0 {
+                return 0;
+            }
+
             let first: u32 = line.chars().next().unwrap().to_digit(RADIX).unwrap();
             let last: u32 = line.chars().last().unwrap().to_digit(RADIX).unwrap();
-            total += first * 10 + last;
-        }
-    }
-    total
+            let total = first * 10 + last;
+            total
+        })
+        .sum()
 }
