@@ -11,6 +11,10 @@ fn main() {
     let etapa_1 = game_cubes(&contents, reds, greens, blues);
 
     println!("Etapa 1: {}", etapa_1);
+
+    let etapa_2 = power_of_sets(&contents);
+
+    println!("Etapa 2: {}", etapa_2);
 }
 
 #[test]
@@ -75,5 +79,52 @@ fn game_cubes(input_games: &str, reds: i32, greens: i32, blues: i32) -> i32 {
         }
     }
 
+    total
+}
+
+#[test]
+fn etapa_2() {
+    let input_games = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
+
+    let result = power_of_sets(input_games);
+
+    assert_eq!(result, 2286);
+}
+
+fn power_of_sets(input_games: &str) -> i32 {
+    let mut total = 0;
+
+    for line in input_games.lines() {
+        let mut game_content = line.split(":");
+
+        let mut max_red = 0;
+        let mut max_green = 0;
+        let mut max_blue = 0;
+
+        game_content.next();
+
+        for game_set in game_content.next().unwrap().split(";") {
+            for game_rolls in game_set.split(",") {
+                let mut count_color = game_rolls.trim().split_whitespace();
+
+                let count = count_color.next().unwrap().parse::<i32>().unwrap();
+                let color = count_color.next().unwrap();
+
+                if color == "red" && count > max_red {
+                    max_red = count;
+                } else if color == "green" && count > max_green {
+                    max_green = count;
+                } else if color == "blue" && count > max_blue {
+                    max_blue = count;
+                }
+            }
+        }
+        total += max_red * max_blue * max_green;
+    }
+    println!("{}", total);
     total
 }
